@@ -6,7 +6,7 @@ HOST = '<Server_IP_Address>'
 PORT = 1234
 BUFFER_SIZE = 1024
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind(HOST, PORT)
+s.bind((HOST, PORT))
 s.listen(1)
 
 conn, addr = s.accept()
