@@ -9,7 +9,7 @@ from ryu.lib.packet import ether_types
 from ryu.lib.packet import vlan
 
 #Initiation of VLAN membership by using port --> [dpid][port] --> VLAN
-vlan_ports = { 4: {1: 2, 2: 3}, 5: {1: 4, 2: 2}, 7: {1: 3, 2: 4}, 8: {1: 2, 2: 3}, 11: {1: 4, 2: 2},  12: {1: 3, 2: 4},  14: {1: 2, 2: 3},  15: {1: 4, 2: 2}}
+vlan_ports = { 4: {1: 30, 2: 20}, 5: {1: 10, 2: 30}, 7: {1: 30, 2: 20}, 8: {1: 20, 2: 10}, 11: {1: 20, 2: 10},  12: {1: 30, 2: 20},  14: {1: 10, 2: 30},  15: {1: 20, 2: 10}}
 
 
 class SimpleSwitch13(app_manager.RyuApp):
