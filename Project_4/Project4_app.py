@@ -24,14 +24,14 @@ from ryu.lib.packet import ether_types
 from ryu.lib.packet import vlan
 
 #Initiating VLAN configuration
-port_vlan = {11:{1:[10], 2:[20]},
-             12:{1:[30], 2:[10]},
-             14:{1:[20], 2:[30]},
-             15:{1:[10], 2:[20]},
-             5:{1:[10], 2:[20]},
-             4:{1:[20], 2:[30]},
-             7:{1:[30], 2:[10]},
-             8:{1:[20], 2:[30]}
+port_vlan = {11:{1:[10], 2:[20], 3:[10,20]},
+             12:{1:[30], 2:[10], 3:[10,30]},
+             14:{1:[20], 2:[30], 3:[20,30]},
+             15:{1:[10], 2:[20], 3:[10.20]},
+             5:{1:[10], 2:[20], 3:[10,30]},
+             4:{1:[20], 2:[30], 3:[20,30]},
+             7:{1:[30], 2:[10], 3:[10,30]},
+             8:{1:[20], 2:[30], 3:[20,30]}
              }
 
 access = {11:[1, 2],
@@ -50,6 +50,8 @@ trunk = {10:[1, 2, 3],
          9:[1, 2, 3],
          2:[1, 2, 3],
          1:[1, 2],}
+
+out_port_type = " "
 
 class SimpleSwitch13(app_manager.RyuApp):
     OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
@@ -92,18 +94,18 @@ class SimpleSwitch13(app_manager.RyuApp):
         datapath.send_msg(mod)
 
     def vlan_membership(self, dpid, in_port, src_vlan):
-        item_=[]
+        B =[]
         self.access_ports = []
         self.trunk_ports = []
 
-        if src_vlan == "NULL"
+        if src_vlan == "NULL":
             return
 
         for item in port_vlan[dpid]:
             vlans = port_vlan[dpid][item]
             if src_vlan in vlans and item != in_port:
-                item_.append(item)
-        for port in item_:
+                B.append(item)
+        for port in B:
             if port in access[dpid]:
                 self.access_ports.append(port)
             else:
@@ -200,7 +202,7 @@ class SimpleSwitch13(app_manager.RyuApp):
         if dst in self.mac_to_port[dpid]:
             out_port_unknown = 0
             out_port = self.mac_to_port[dpid][dst]
-            if src_vlan != "NULL"
+            if src_vlan != "NULL":
                 if out_port in access[dpid]:
                     out_port_type = "ACCESS"
                 else:
@@ -216,15 +218,15 @@ class SimpleSwitch13(app_manager.RyuApp):
 
         # actions = [parser.OFPActionOutput(out_port)]
 
-        if out_port_unknown != SimpleSwitch13:
-            if vlan_header_present and out_port_type == "ACCESS"
+        if out_port_unknown != 1:
+            if vlan_header_present and out_port_type == "ACCESS":
                 match = parser.OFPMatch(in_port=in_port, eth_dst=dst, vlan_vid=(0x1000 | src_vlan))
                 actions = [parser.OFPActionPopVlan(),
                            parser.OFPActionOutput(out_port)]
             elif vlan_header_present and out_port_type == "TRUNK":
                 match = parser.OFPMatch(in_port=in_port, eth_dst=dst, vlan_vid=(0x1000 | src_vlan))
                 actions = [parser.OFPActionOutput(out_port)]
-            elif vlan_header_present != SimpleSwitch13 and out_port_type == "TRUNK":
+            elif vlan_header_present != 1 and out_port_type == "TRUNK":
                 match = parser.OFPMatch(in_port=in_port, eth_dst=dst)
                 actions = [parser.OFPActionPushVlan(33024),
                            parser.OFPActionSetField(vlan_vid=src_vlan),
@@ -245,7 +247,7 @@ class SimpleSwitch13(app_manager.RyuApp):
                 actions = self.getActionsArrayTrunk(out_port_access, out_port_trunk, parser)
             elif vlan_header_present == 0 and src_vlan != "NULL":
                 actions = self.getActionArrayAccess(out_port_access, out_port_trunk, src_vlan, parser)
-            elif in_port_type == "NORMAL UNTAGGED"
+            elif in_port_type == "NORMAL UNTAGGED":
                 actions = self. getActionsNormalUntagged(dpid, in_port, parser)
             else:
                 actions = [parser.OFPActionOutput(ofproto.OFPP_FLOOD)]
